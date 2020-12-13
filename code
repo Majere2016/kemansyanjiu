@@ -1,0 +1,50 @@
+# 清空环境
+rm(list=ls())
+
+# 安装包并加载包
+# 使用k-means聚类所需的包：factoextra和cluster 
+site="https://mirrors.tuna.tsinghua.edu.cn/CRAN"
+package_list = c("factoextra","cluster")
+for(p in package_list){
+  if(!suppressWarnings(suppressMessages(require(p, character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE)))){
+    install.packages(p, repos=site)
+    suppressWarnings(suppressMessages(library(p, character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE)))
+  }
+}
+
+setwd("C:/Users/mazhecheng/Desktop/")
+
+library(data.table)
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library("Matrix")
+library(pROC)
+library(Rcpp)
+
+sep_train_dier <- read.delim("C:/Users/mazhecheng/Desktop/sep_train_dier.csv")
+
+df <- sep_train_dier
+
+row.names(df) <- df$key
+
+df <- df %>% select(-c(key,dt,risk_flag))
+
+
+desc_stats = data.frame( Min=apply(df, 2, min),#minimum
+                         Med=apply(df, 2, median),#median
+                         Mean=apply(df, 2, mean),#mean
+                         SD=apply(df, 2, sd),#Standard deviation
+                         Max=apply(df, 2, max)#maximum
+)
+desc_stats = round(desc_stats, 1)#保留小数点后一位head(desc_stats)
+desc_stats
+
+
+df = scale(df)
+
+res = get_clust_tendency(df, 40, graph = TRUE)
+
+res$hopkins_stat
+
